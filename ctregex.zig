@@ -725,10 +725,11 @@ inline fn matchAtom(comptime atom: RegexParser.Atom, comptime options: MatchOpti
         .char_class => |class| return readCharClass(class, options, str),
         .literal => |lit| {
             const encoded_lit = comptime ctEncode(lit, options.encoding);
-            if (std.mem.eql(options.encoding.CharT(), encoded_lit, str[0..encoded_lit.len])) {
-                return str[0..encoded_lit.len];
+
+            inline for (encoded_lit, str[0..encoded_lit.len]) |l, c| {
+                if (l != c) return null;
             }
-            return null;
+            return str[0..encoded_lit.len];
         },
         .brackets => |brackets| {
             var this_slice: @TypeOf(str) = undefined;
