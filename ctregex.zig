@@ -112,7 +112,7 @@ const RegexParser = struct {
     fn skipWhitespace(comptime parser: *RegexParser) void {
         while (parser.iterator.i < parser.iterator.bytes.len and
             (parser.iterator.bytes[parser.iterator.i] == ' ' or
-            parser.iterator.bytes[parser.iterator.i] == '\t')) : (parser.iterator.i += 1)
+                parser.iterator.bytes[parser.iterator.i] == '\t')) : (parser.iterator.i += 1)
         {}
     }
 
@@ -904,7 +904,7 @@ pub fn MatchResult(comptime regex: []const u8, comptime options: MatchOptions) t
                 self.captures = [1]?[]const CharT{null} ** capture_len;
             }
 
-            pub usingnamespace if (capture_len != 0)
+            pub const capture = if (capture_len != 0)
                 struct {
                     pub fn capture(self: Self, comptime name: []const u8) ?[]const CharT {
                         inline for (capture_names2, 0..) |maybe_name, curr_idx| {
@@ -915,9 +915,8 @@ pub fn MatchResult(comptime regex: []const u8, comptime options: MatchOptions) t
                         }
                         @compileError("No capture named '" ++ name ++ "'");
                     }
-                }
-            else
-                struct {};
+                }.capture
+            else {};
         };
     }
     return void;
